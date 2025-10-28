@@ -1,40 +1,35 @@
-# EXP 8 — Cache Mapping Policies
 import math
 
-def bit_calculations():
-    cache_size = 16 * 1024
-    mem_size = 4 * 1024 * 1024
-    line_size = 8
-    address_bits = 22
+def cache_mapping():
+    cache = 16*1024       # 16 KB
+    memory = 4*1024*1024  # 4 MB
+    line = 8              # bytes per line
+    addr = 22             # address bits
 
-    num_cache_lines = cache_size // line_size
-    num_blocks = mem_size // line_size
+    lines = cache // line
+    blocks = memory // line
 
-    offset_bits = int(math.log2(line_size))
-    index_bits_direct = int(math.log2(num_cache_lines))
-    tag_bits_direct = address_bits - (index_bits_direct + offset_bits)
+    offset = int(math.log2(line))
 
-    index_bits_assoc = 0
-    tag_bits_assoc = address_bits - offset_bits
+    # Direct Mapping
+    index_d = int(math.log2(lines))
+    tag_d = addr - index_d - offset
 
-    set_size = 2
-    num_sets = num_cache_lines // set_size
-    index_bits_set = int(math.log2(num_sets))
-    tag_bits_set = address_bits - (index_bits_set + offset_bits)
+    # Fully Associative
+    index_a = 0
+    tag_a = addr - offset
 
-    print("\nCache and Memory Parameters:")
-    print(f"Cache size: {cache_size} bytes ({cache_size//1024} KB)")
-    print(f"Main memory size: {mem_size} bytes ({mem_size//1024//1024} MB)")
-    print(f"Cache line size: {line_size} bytes")
-    print(f"Cache lines: {num_cache_lines}")
-    print(f"Main memory blocks: {num_blocks}")
-    print(f"Address lines: {address_bits} bits\n")
+    # 2-Way Set Associative
+    sets = lines // 2
+    index_s = int(math.log2(sets))
+    tag_s = addr - index_s - offset
 
-    print("{:<25} {:<10} {:<12} {:<12}".format("Mapping Type", "Tag bits", "Index bits", "Offset bits"))
-    print("-" * 65)
-    print("{:<25} {:<10} {:<12} {:<12}".format("Direct Mapping", tag_bits_direct, index_bits_direct, offset_bits))
-    print("{:<25} {:<10} {:<12} {:<12}".format("Associative Mapping", tag_bits_assoc, index_bits_assoc, offset_bits))
-    print("{:<25} {:<10} {:<12} {:<12}".format("2-Way Set Associative", tag_bits_set, index_bits_set, offset_bits))
+    print("\nMapping Type                Tag   Index   Offset")
+    print("-----------------------------------------------")
+    print(f"Direct Mapping              {tag_d:<5} {index_d:<6} {offset}")
+    print(f"Associative Mapping         {tag_a:<5} {index_a:<6} {offset}")
+    print(f"2-Way Set Associative       {tag_s:<5} {index_s:<6} {offset}")
 
 if __name__ == "__main__":
-    bit_calculations()
+    cache_mapping()
+
