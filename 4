@@ -1,0 +1,37 @@
+def to_binary(n, bits):
+    # Convert signed integer to binary with 2's complement
+    return format(n if n >= 0 else (1 << bits) + n, f'0{bits}b')
+
+def booth_multiply(m, r, bits=8):
+    M = to_binary(m, bits)
+    R = to_binary(r, bits)
+
+    A = M + ('0' * bits)
+    S = to_binary(-m, bits) + ('0' * bits)
+    P = ('0' * bits) + R + '0'
+
+    for _ in range(bits):
+        if P[-2:] == '01':
+            P = format(int(P, 2) + int(A, 2), f'0{2*bits+1}b')
+        elif P[-2:] == '10':
+            P = format(int(P, 2) + int(S, 2), f'0{2*bits+1}b')
+
+        # Arithmetic right shift
+        P = P[0] + P[:-1]
+
+    # Remove extra bit
+    product_binary = P[:-1]
+
+    # Convert back to decimal (handle negative result)
+    result = int(product_binary, 2)
+    if result >= 1 << (2*bits - 1):
+        result -= 1 << (2*bits)
+
+    print("\n=== Final Result ===")
+    print("Product (Decimal):", result)
+    print("Product (Binary) :", product_binary)
+
+# ----- MAIN -----
+m = int(input("Enter Multiplicand (M): "))
+r = int(input("Enter Multiplier (R): "))
+booth_multiply(m, r)
