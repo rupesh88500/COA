@@ -1,0 +1,52 @@
+import struct
+
+def float_to_ieee754_single(num):
+    # pack float into 32-bit binary
+    bits = struct.unpack(">I", struct.pack(">f", num))[0]
+    bstr = f"{bits:032b}"
+    return {
+        "decimal": num,
+        "sign": bstr[0],
+        "exponent": bstr[1:9],   # 8 bits
+        "mantissa": bstr[9:],    # 23 bits
+        "binary": bstr
+    }
+
+def float_to_ieee754_double(num):
+    # pack float into 64-bit binary
+    bits = struct.unpack(">Q", struct.pack(">d", num))[0]
+    bstr = f"{bits:064b}"
+    return {
+        "decimal": num,
+        "sign": bstr[0],
+        "exponent": bstr[1:12],  # 11 bits
+        "mantissa": bstr[12:],   # 52 bits
+        "binary": bstr
+    }
+
+# Main Program
+num = float(input("Enter a floating point number: "))
+choice = input("Choose format (32 or 64 bit): ")
+
+if choice == "32":
+    info = float_to_ieee754_single(num)
+    print("\n== IEEE 754 Single Precision (32-bit) ==")
+    print("Decimal  :", info["decimal"])
+    print("Binary   :", info["binary"])
+    print("Sign     :", info["sign"])
+    print("Exponent :", info["exponent"])
+    print("Mantissa :", info["mantissa"])
+    print("IEEE754  :", f"{info['sign']} | {info['exponent']} | {info['mantissa']}")
+
+elif choice == "64":
+    info = float_to_ieee754_double(num)
+    print("\n== IEEE 754 Double Precision (64-bit) ==")
+    print("Decimal  :", info["decimal"])
+    print("Binary   :", info["binary"])
+    print("Sign     :", info["sign"])
+    print("Exponent :", info["exponent"])
+    print("Mantissa :", info["mantissa"])
+    print("IEEE754  :", f"{info['sign']} | {info['exponent']} | {info['mantissa']}")
+
+else:
+    print("Invalid choice! Please enter 32 or 64.")
