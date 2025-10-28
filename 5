@@ -1,50 +1,27 @@
-def to_binary(n, bits):
-    return format(n, f'0{bits}b')
+def to_bin(x, n):
+    return format(x & ((1<<n)-1), f'0{n}b')
 
-def non_restoring_division(dividend, divisor, bits=8):
-    # Convert to binary strings
+def non_restoring_division(Q, M, bits=8):
     A = 0
-    Q = dividend
-    M = divisor
+    for _ in range(bits):
+        A = ((A << 1) | (Q >> (bits-1))) & ((1<<bits)-1)
+        Q = (Q << 1) & ((1<<bits)-1)
 
-    print("\nInitial Values:")
-    print(f"A = {A} ({to_binary(A, bits)})")
-    print(f"Q = {Q} ({to_binary(Q, bits)})")
-    print(f"M = {M} ({to_binary(M, bits)})\n")
-
-    for i in range(bits):
-        print(f"Step {i+1}:")
-        # Left shift A and Q together
-        A = (A << 1) | (Q >> (bits - 1))
-        A &= (1 << bits) - 1  # keep bits
-        Q = (Q << 1) & ((1 << bits) - 1)  # keep bits
-
-        print(f"  After Left Shift: A={to_binary(A, bits)}, Q={to_binary(Q, bits)}")
-
-        # A = A - M
-        A_temp = A - M
-        print(f"  A - M = {A} - {M} = {A_temp}")
-
-        if A_temp < 0:
-            # A was negative -> restore and set Q LSB = 0
-            print("  A is negative → Restore A and set Q LSB = 0")
-            Q = Q | 0  # No change
+        if A >= 0:
+            A = A - M
+            Q |= 1
         else:
-            # A positive -> keep result and set Q LSB = 1
-            print("  A is positive → Update A and set Q LSB = 1")
-            A = A_temp
-            Q = Q | 1
-        
-        print(f"  Updated: A={to_binary(A, bits)}, Q={to_binary(Q, bits)}\n")
+            A = A + M
+            Q |= 0
 
-    print("\n=== Final Result ===")
-    print("Quotient (Decimal):", Q)
-    print("Quotient (Binary) :", to_binary(Q, bits))
-    print("Remainder (Decimal):", A)
-    print("Remainder (Binary) :", to_binary(A, bits))
+    # Final correction if A negative
+    if A < 0:
+        A += M
 
+    print("Quotient  :", Q, "=", to_bin(Q, bits))
+    print("Remainder :", A, "=", to_bin(A, bits))
 
-# ---- MAIN ----
-dividend = int(input("Enter Dividend: "))
-divisor = int(input("Enter Divisor: "))
-non_restoring_division(dividend, divisor)
+# MAIN
+d = int(input("Dividend: "))
+s = int(input("Divisor : "))
+non_restoring_division(d, s)
