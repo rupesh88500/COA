@@ -1,49 +1,21 @@
-def to_binary(n, bits):
-    return format(n, f'0{bits}b')
+def to_bin(x, n): 
+    return format(x & ((1<<n)-1), f'0{n}b')
 
-def restoring_division(dividend, divisor, bits=8):
+def restoring_division(Q, M, bits=8):
     A = 0
-    Q = dividend
-    M = divisor
+    for _ in range(bits):
+        A = ((A<<1) | (Q>>(bits-1))) & ((1<<bits)-1)
+        Q = (Q<<1) & ((1<<bits)-1)
+        A2 = A - M
 
-    print("\nInitial Values:")
-    print(f"A = {to_binary(A, bits)}")
-    print(f"Q = {to_binary(Q, bits)}")
-    print(f"M = {to_binary(M, bits)}\n")
+        if A2 >= 0:
+            A = A2
+            Q |= 1
 
-    for i in range(bits):
-        print(f"Step {i+1}:")
-        
-        # Shift left (A,Q)
-        A = ((A << 1) | (Q >> (bits - 1))) & ((1 << bits) - 1)
-        Q = (Q << 1) & ((1 << bits) - 1)
+    print("Quotient  :", Q, "=", to_bin(Q, bits))
+    print("Remainder :", A, "=", to_bin(A, bits))
 
-        print(f"  After Shift: A={to_binary(A, bits)}, Q={to_binary(Q, bits)}")
-
-        # A = A - M
-        A_temp = A - M
-        print(f"  A - M = {A} - {M} = {A_temp}")
-
-        if A_temp < 0:
-            # Restore A and set Q0 = 0
-            print("  Negative → Restore A and set Q0 = 0")
-            Q = Q | 0  # no change
-        else:
-            # Accept A_temp and set Q0 = 1
-            print("  Positive → Update A and set Q0 = 1")
-            A = A_temp
-            Q = Q | 1
-        
-        print(f"  Updated: A={to_binary(A, bits)}, Q={to_binary(Q, bits)}\n")
-
-    print("\n=== Final Result ===")
-    print("Quotient (Decimal):", Q)
-    print("Quotient (Binary) :", to_binary(Q, bits))
-    print("Remainder (Decimal):", A)
-    print("Remainder (Binary) :", to_binary(A, bits))
-
-
-# ---- MAIN ----
-dividend = int(input("Enter Dividend: "))
-divisor = int(input("Enter Divisor: "))
-restoring_division(dividend, divisor)
+# Main
+d = int(input("Dividend: "))
+s = int(input("Divisor : "))
+restoring_division(d, s)
