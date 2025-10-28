@@ -1,0 +1,37 @@
+# EXP 9 — Memory Hierarchy (Simplified)
+
+def memory_hierarchy(cost, size, hit, time):
+    n = len(cost)
+
+    # Average Cost per bit
+    avg_cost = sum(cost[i] * size[i] for i in range(n)) / sum(size)
+
+    # Average Access Time
+    if n == 2:
+        avg_time = hit[0]*time[0] + (1-hit[0])*time[1]
+    elif n == 3:
+        avg_time = (hit[0]*time[0] +
+                    (1-hit[0])*hit[1]*time[1] +
+                    (1-hit[0])*(1-hit[1])*time[2])
+    else:
+        raise ValueError("Supports only 2 or 3 levels")
+
+    print("\nLevels:", n)
+    print("Average Cost per bit  =", round(avg_cost, 7), "INR")
+    print("Average Access Time   =", round(avg_time, 1), "μs")
+
+# Example Inputs
+
+memory_hierarchy(
+    cost=[0.1, 0.01],
+    size=[100, 10000],
+    hit=[0.7, 1.0],
+    time=[1, 50]
+)
+
+memory_hierarchy(
+    cost=[0.1, 0.01, 0.0001],
+    size=[100, 10000, 1000000],
+    hit=[0.7, 0.85, 1.0],
+    time=[1, 50, 5000]
+)
