@@ -1,37 +1,25 @@
-def to_binary(n, bits):
-    # Convert signed integer to binary with 2's complement
-    return format(n if n >= 0 else (1 << bits) + n, f'0{bits}b')
+def to_bin(x, n):
+    return format(x if x >= 0 else (1<<n)+x, f'0{n}b')
 
-def booth_multiply(m, r, bits=8):
-    M = to_binary(m, bits)
-    R = to_binary(r, bits)
-
-    A = M + ('0' * bits)
-    S = to_binary(-m, bits) + ('0' * bits)
-    P = ('0' * bits) + R + '0'
+def booth(m, r, bits=8):
+    M  = to_bin(m, bits)
+    S  = to_bin(-m, bits)
+    P  = "0"*bits + to_bin(r, bits) + "0"
 
     for _ in range(bits):
-        if P[-2:] == '01':
-            P = format(int(P, 2) + int(A, 2), f'0{2*bits+1}b')
-        elif P[-2:] == '10':
-            P = format(int(P, 2) + int(S, 2), f'0{2*bits+1}b')
+        if P[-2:] == "01":   P = format(int(P,2) + int(M + "0"*bits,2), f'0{2*bits+1}b')
+        elif P[-2:] == "10": P = format(int(P,2) + int(S + "0"*bits,2), f'0{2*bits+1}b')
+        P = P[0] + P[:-1]    # arithmetic right shift
 
-        # Arithmetic right shift
-        P = P[0] + P[:-1]
+    P = P[:-1]              # remove extra bit
+    result = int(P, 2)
+    if result >= (1 << (2*bits-1)):  
+        result -= (1 << (2*bits))
 
-    # Remove extra bit
-    product_binary = P[:-1]
+    print("\nProduct (Decimal):", result)
+    print("Product (Binary) :", P)
 
-    # Convert back to decimal (handle negative result)
-    result = int(product_binary, 2)
-    if result >= 1 << (2*bits - 1):
-        result -= 1 << (2*bits)
-
-    print("\n=== Final Result ===")
-    print("Product (Decimal):", result)
-    print("Product (Binary) :", product_binary)
-
-# ----- MAIN -----
-m = int(input("Enter Multiplicand (M): "))
-r = int(input("Enter Multiplier (R): "))
-booth_multiply(m, r)
+# MAIN
+m = int(input("M: "))
+r = int(input("R: "))
+booth(m, r)
